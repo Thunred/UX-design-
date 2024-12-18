@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaming - Page {{ page }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="search-bar mb-4">
+            <form method="get" action="{{ url_for('index') }}">
+                <div class="row">
+                    <div class="col-md-8">
+                        <input type="text" name="search" id="search" class="form-control" placeholder="Rechercher un jeu..." value="{{ request.args.get('search', '') }}">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" name="min_price" class="form-control" placeholder="Prix min" value="{{ request.args.get('min_price', '') }}">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" name="max_price" class="form-control" placeholder="Prix max" value="{{ request.args.get('max_price', '') }}">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3 w-100">Rechercher</button>
+            </form>
+            <div id="suggestions" class="list-group" style="display:none;"></div>
+        </div>
+
+        <h1 class="text-center mb-4">Liste des Jeux</h1>
+
+        <div class="row">
+            {% for game in games %}
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        <img src="{{ url_for('serve_image', filename=game[4][7:]) }}" class="card-img-top" alt="Image du jeu">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ game[1] }}</h5>
+                            <p class="card-price">{{ game[2] }}</p>
+                            <p class="card-discount">{{ game[6] }}</p>
+                            <a href="{{ game[5]}}" class="btn btn-primary w-100">Voir plus</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="pagination">
+            {% if page > 1 %}
+                <a href="{{ url_for('index', page=page-1) }}">Précédent</a>
+            {% endif %}
+            <!-- Première page -->
+            {% if page > 2 %}
+                <a href="{{ url_for('index', page=1) }}">1</a>
+                {% if page > 3 %}
+                    <span class="dots">...</span>
+                {% endif %}
+            {% endif %}
+        
+            <!-- Pages autour de la page actuelle -->
+            {% for p in range(page-1, page+2) %}
+                {% if p > 0 and p <= total_pages %}
+                    {% if p == page %}
+                        <span class="current">{{ p }}</span>
+                    {% else %}
+                        <a href="{{ url_for('index', page=p) }}">{{ p }}</a>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        
+            <!-- Dernière page -->
+            {% if page < total_pages - 1 %}
+                {% if page < total_pages - 2 %}
+                    <span class="dots">...</span>
+                {% endif %}
+                <a href="{{ url_for('index', page=total_pages) }}">{{ total_pages }}</a>
+            {% endif %}
+        
+            {% if page < total_pages %}
+                <a href="{{ url_for('index', page=page+1) }}">Suivant</a>
+            {% endif %}
+        </div>
+        
+        
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha1/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
